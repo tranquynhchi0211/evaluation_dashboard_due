@@ -5,8 +5,6 @@ from PIL import Image
 import plotly.express as px
 import plotly.graph_objects as go
 from collections import Counter
-from fpdf import FPDF
-import os
 
 # Read data from csv file
 df = pd.read_csv("danhsach_due.csv")
