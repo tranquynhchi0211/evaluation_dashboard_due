@@ -162,18 +162,18 @@ if not filtered_data.empty:
 
     # Ánh xạ nội dung câu hỏi
     question_labels = {
-        'Q1': 'Giảng viên giới thiệu rõ ràng, đầy đủ về đề cương chi tiết học phần, gồm: chuẩn đầu ra, nội dung, phương pháp dạy - học, phương pháp kiểm tra - đánh giá, tài liệu học tập của học phần',
-        'Q2': 'Nội dung của học phần phù hợp với năng lực của người học',
-        'Q3': 'Phương pháp dạy - học phù hợp với chuẩn đầu ra và nội dung của học phần',
-        'Q4': 'Giảng viên thực hiện đầy đủ kế hoạch dạy - học đã công bố và tuân thủ các quy định trong giảng dạy',
-        'Q5': 'Giảng viên có cập nhật kiến thức mới và thực tế trong bài giảng',
-        'Q6': 'Hoạt động dạy - học khơi gợi đam mê khám phá và giúp phát triển khả năng tự học',
-        'Q7': 'Giảng viên khuyến khích người học chủ động tham gia thảo luận, giải quyết vấn đề trong giờ học',
-        'Q8': 'Giảng viên tận tụy, sẵn sàng giúp đỡ, giải đáp thỏa đáng các thắc mắc của người học',
-        'Q9': 'Giảng viên sử dụng hiệu quả Elearning và các phương tiện công nghệ trong tổ chức dạy học',
-        'Q10': 'Phương pháp kiểm tra, đánh giá phù hợp với chuẩn đầu ra và nội dung của học phần',
-        'Q11': 'Việc đánh giá được thực hiện công bằng, khách quan và đảm bảo độ tin cậy',
-        'Q12': 'Anh/Chị hài lòng về chất lượng và hiệu quả giảng dạy của giảng viên đối với sự tiến bộ trong học tập của bản thân'
+        'Q1': '1. Giảng viên giới thiệu rõ ràng, đầy đủ về đề cương chi tiết học phần, gồm: chuẩn đầu ra, nội dung, phương pháp dạy - học, phương pháp kiểm tra - đánh giá, tài liệu học tập của học phần',
+        'Q2': '2. Nội dung của học phần phù hợp với năng lực của người học',
+        'Q3': '3. Phương pháp dạy - học phù hợp với chuẩn đầu ra và nội dung của học phần',
+        'Q4': '4. Giảng viên thực hiện đầy đủ kế hoạch dạy - học đã công bố và tuân thủ các quy định trong giảng dạy',
+        'Q5': '5. Giảng viên có cập nhật kiến thức mới và thực tế trong bài giảng',
+        'Q6': '6. Hoạt động dạy - học khơi gợi đam mê khám phá và giúp phát triển khả năng tự học',
+        'Q7': '7. Giảng viên khuyến khích người học chủ động tham gia thảo luận, giải quyết vấn đề trong giờ học',
+        'Q8': '8. Giảng viên tận tụy, sẵn sàng giúp đỡ, giải đáp thỏa đáng các thắc mắc của người học',
+        'Q9': '9. Giảng viên sử dụng hiệu quả Elearning và các phương tiện công nghệ trong tổ chức dạy học',
+        'Q10':'10. Phương pháp kiểm tra, đánh giá phù hợp với chuẩn đầu ra và nội dung của học phần',
+        'Q11': '11. Việc đánh giá được thực hiện công bằng, khách quan và đảm bảo độ tin cậy',
+        'Q12': '12. Anh/Chị hài lòng về chất lượng và hiệu quả giảng dạy của giảng viên đối với sự tiến bộ trong học tập của bản thân'
     }
     result_df['Câu hỏi'] = result_df['Câu hỏi'].map(question_labels)
 
