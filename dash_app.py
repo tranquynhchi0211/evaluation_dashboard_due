@@ -40,38 +40,81 @@ with col3:
     box_date = str(datetime.datetime.now().strftime("%d %B %Y"))
     st.write(f"Last updated by:  \n {box_date}")
 
-filtered_df = df.copy()
-# ---------- Bộ lọc Đơn vị (Khoa) ----------
-with filter_col1:
-    all_khoa = sorted(filtered_df['Đơn vị'].dropna().unique())
-    selected_khoa = st.multiselect('Chọn Khoa (Đơn vị)', ['Tất cả'] + all_khoa)
-    if 'Tất cả' not in selected_khoa and selected_khoa:
-        filtered_df = filtered_df[filtered_df['Đơn vị'].isin(selected_khoa)]
-    filtered_df_khoa = filtered_df
+def get_filtered_df(khoa, teacher, subject, class_code):
+    filtered = df.copy()
 
-# ---------- Bộ lọc Giảng viên ----------
-with filter_col2:
-    all_teachers = sorted(filtered_df['Teacher_name'].dropna().unique())
-    selected_teachers = st.multiselect('Chọn Giảng viên', ['Tất cả'] + all_teachers)
-    if 'Tất cả' not in selected_teachers and selected_teachers:
-        filtered_df = filtered_df[filtered_df['Teacher_name'].isin(selected_teachers)]
-    filtered_df_teacher = filtered_df
+    if khoa and 'Tất cả' not in khoa:
+        filtered = filtered[filtered['Đơn vị'].isin(khoa)]
 
-# ---------- Bộ lọc Môn học ----------
-with filter_col3:
-    all_subjects = sorted(filtered_df['Subject_name'].dropna().unique())
-    selected_subjects = st.multiselect('Chọn Môn học', ['Tất cả'] + all_subjects)
-    if 'Tất cả' not in selected_subjects and selected_subjects:
-        filtered_df = filtered_df[filtered_df['Subject_name'].isin(selected_subjects)]
-    filtered_df_subject = filtered_df
+    if teacher and 'Tất cả' not in teacher:
+        filtered = filtered[filtered['Teacher_name'].isin(teacher)]
 
-# ---------- Bộ lọc Mã lớp ----------
-with filter_col4:
-    all_classes = sorted(filtered_df['Class_code'].dropna().unique())
-    selected_classes = st.multiselect('Chọn Mã lớp học', ['Tất cả'] + all_classes)
-    if 'Tất cả' not in selected_classes and selected_classes:
-        filtered_df = filtered_df[filtered_df['Class_code'].isin(selected_classes)]
-    final_filtered_df = filtered_df
+    if subject and 'Tất cả' not in subject:
+        filtered = filtered[filtered['Subject_name'].isin(subject)]
+
+    if class_code and 'Tất cả' not in class_code:
+        filtered = filtered[filtered['Class_code'].isin(class_code)]
+
+    return filtered
+
+# ---------- Thiết lập session_state mặc định ----------
+for key in ['selected_khoa', 'selected_teacher', 'selected_subject', 'selected_class']:
+    if key not in st.session_state:
+        st.session_state[key] = ['Tất cả']
+
+# ---------- Lấy dữ liệu đã lọc ----------
+filtered_df = get_filtered_df(
+    st.session_state['selected_khoa'],
+    st.session_state['selected_teacher'],
+    st.session_state['selected_subject'],
+    st.session_state['selected_class']
+)
+
+# ---------- Lọc lại danh sách các giá trị có thể chọn ----------
+available_khoa = sorted(filtered_df['Đơn vị'].dropna().unique())
+available_teacher = sorted(filtered_df['Teacher_name'].dropna().unique())
+available_subject = sorted(filtered_df['Subject_name'].dropna().unique())
+available_class = sorted(filtered_df['Class_code'].dropna().unique())
+
+# ---------- Hiển thị các bộ lọc với giá trị được cập nhật ----------
+with st.sidebar:
+    selected_khoa = st.multiselect(
+        "Chọn Khoa (Đơn vị)", 
+        options=['Tất cả'] + available_khoa,
+        default=st.session_state['selected_khoa'],
+        key='selected_khoa'
+    )
+
+    selected_teacher = st.multiselect(
+        "Chọn Giảng viên",
+        options=['Tất cả'] + available_teacher,
+        default=st.session_state['selected_teacher'],
+        key='selected_teacher'
+    )
+
+    selected_subject = st.multiselect(
+        "Chọn Môn học",
+        options=['Tất cả'] + available_subject,
+        default=st.session_state['selected_subject'],
+        key='selected_subject'
+    )
+
+    selected_class = st.multiselect(
+        "Chọn Mã lớp",
+        options=['Tất cả'] + available_class,
+        default=st.session_state['selected_class'],
+        key='selected_class'
+    )
+
+# ---------- Tính lại từng bước để giữ tên biến ----------
+filtered_df_khoa = get_filtered_df(selected_khoa, ['Tất cả'], ['Tất cả'], ['Tất cả'])
+filtered_df_teacher = get_filtered_df(selected_khoa, selected_teacher, ['Tất cả'], ['Tất cả'])
+filtered_df_subject = get_filtered_df(selected_khoa, selected_teacher, selected_subject, ['Tất cả'])
+final_filtered_df = get_filtered_df(selected_khoa, selected_teacher, selected_subject, selected_class)
+
+# ---------- Hiển thị kết quả ----------
+st.markdown("### 🔍 Dữ liệu đã lọc")
+st.dataframe(final_filtered_df)
 
 # ---------- Hiển thị kết quả ----------
 # st.write("🔍 **Dữ liệu đã lọc:**")
