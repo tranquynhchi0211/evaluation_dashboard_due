@@ -40,46 +40,42 @@ with col3:
     box_date = str(datetime.datetime.now().strftime("%d %B %Y"))
     st.write(f"Last updated by:  \n {box_date}")
 
-# ---------- Bộ lọc Đơn vị (Khoa) ----------
-with filter_col1:
-    all_khoa = sorted(df['Đơn vị'].dropna().unique())
-    selected_khoa = st.multiselect('Chọn Khoa (Đơn vị)', ['Tất cả'] + all_khoa)
+filter_cols = {
+    'Đơn vị': 'Chọn Khoa (Đơn vị)',
+    'Teacher_name': 'Chọn Giảng viên',
+    'Subject_name': 'Chọn Môn học',
+    'Class_code': 'Chọn Mã lớp'
+}
 
-    # Nếu chọn "Tất cả", lấy toàn bộ
-    if 'Tất cả' in selected_khoa or not selected_khoa:
-        filtered_df_khoa = df.copy()
-    else:
-        filtered_df_khoa = df[df['Đơn vị'].isin(selected_khoa)]
+# Lưu lựa chọn người dùng
+selections = {}
 
-# ---------- Bộ lọc Giảng viên ----------
-with filter_col2:
-    all_teachers = sorted(filtered_df_khoa['Teacher_name'].dropna().unique())
-    selected_teachers = st.multiselect('Chọn Giảng viên', ['Tất cả'] + all_teachers)
+# Lọc dữ liệu ban đầu (chưa lọc gì)
+final_filtered_df = df.copy()
 
-    if 'Tất cả' in selected_teachers or not selected_teachers:
-        filtered_df_teacher = filtered_df_khoa
-    else:
-        filtered_df_teacher = filtered_df_khoa[filtered_df_khoa['Teacher_name'].isin(selected_teachers)]
+# Tạo 4 cột song song
+filter_col1, filter_col2, filter_col3, filter_col4 = st.columns(4)
 
-# ---------- Bộ lọc Môn học ----------
-with filter_col3:
-    all_subjects = sorted(filtered_df_teacher['Subject_name'].dropna().unique())
-    selected_subjects = st.multiselect('Chọn Môn học', ['Tất cả'] + all_subjects)
+# Tạo mapping cột → giao diện
+filter_widgets = {
+    'Đơn vị': filter_col1,
+    'Teacher_name': filter_col2,
+    'Subject_name': filter_col3,
+    'Class_code': filter_col4
+}
 
-    if 'Tất cả' in selected_subjects or not selected_subjects:
-        filtered_df_subject = filtered_df_teacher
-    else:
-        filtered_df_subject = filtered_df_teacher[filtered_df_teacher['Subject_name'].isin(selected_subjects)]
+# 1. Lấy các lựa chọn hiện tại từ người dùng (dựa trên filtered_df tạm thời)
+for col, label in filter_cols.items():
+    with filter_widgets[col]:
+        unique_values = sorted(final_filtered_df[col].dropna().unique())
+        options = ['Tất cả'] + unique_values
+        selections[col] = st.multiselect(label, options, default=['Tất cả'])
 
-# ---------- Bộ lọc Mã lớp ----------
-with filter_col4:
-    all_classes = sorted(filtered_df_subject['Class_code'].dropna().unique())
-    selected_classes = st.multiselect('Chọn Mã lớp học', ['Tất cả'] + all_classes)
-
-    if 'Tất cả' in selected_classes or not selected_classes:
-        final_filtered_df = filtered_df_subject
-    else:
-        final_filtered_df = filtered_df_subject[filtered_df_subject['Class_code'].isin(selected_classes)]
+# 2. Áp dụng lọc đồng thời tất cả các điều kiện người dùng đã chọn
+for col in filter_cols:
+    selected = selections[col]
+    if 'Tất cả' not in selected and selected:
+        final_filtered_df = final_filtered_df[final_filtered_df[col].isin(selected)]
 
 # ---------- Hiển thị kết quả ----------
 # st.write("🔍 **Dữ liệu đã lọc:**")
