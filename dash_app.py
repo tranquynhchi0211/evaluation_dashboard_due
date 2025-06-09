@@ -183,8 +183,8 @@ if not filtered_data.empty:
         count_level = [(filtered_data[q] == i).sum() for i in range(1, 6)]
 
         # Trung bình các lớp cùng học phần
-        if selected_subjects and 'Tất cả' not in selected_subjects:
-            subject_data = df[df['Subject_name'].isin(selected_subjects)]
+        if selected_subject and 'Tất cả' not in selected_subject:
+            subject_data = df[df['Subject_name'].isin(selected_subject)]
         else:
             subject_data = df.copy()
         avg_class_hp = subject_data[q].mean()
@@ -242,8 +242,8 @@ if not filtered_data.empty:
     st.write(f"📊 **Kết quả đánh giá**")
     if selected_teachers and 'Tất cả' not in selected_teachers:
         st.markdown(f"Giảng viên: **{', '.join(selected_teachers)}**")
-    if selected_subjects and 'Tất cả' not in selected_subjects:
-        st.markdown(f"Môn học: **{', '.join(selected_subjects)}**")
+    if selected_subject and 'Tất cả' not in selected_subject:
+        st.markdown(f"Môn học: **{', '.join(selected_subject)}**")
 
     # Hàm hiển thị HTML bảng
     def render_html_table(df):
@@ -304,7 +304,7 @@ with chart_col:
         )])
 
         fig.update_layout(
-            title=f'Phân bố cảm xúc - {selected_teachers} - {selected_subjects}',
+            title=f'Phân bố cảm xúc - {selected_teachers} - {selected_subject}',
             xaxis_title='Cảm xúc',
             yaxis_title='Số lượng',
             yaxis=dict(range=[0, max(values)+10000]),
