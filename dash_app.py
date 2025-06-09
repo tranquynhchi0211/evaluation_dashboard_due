@@ -87,13 +87,13 @@ for col in filter_cols:
 # st.dataframe(final_filtered_df[final_filtered_df['Class_code'] == selected_class])
 
 # Lọc dữ liệu theo giảng viên và môn học đã chọn
-filtered_data = final_filtered_df.copy()
+filtered_data = filtered_df.copy()
 # # (Tuỳ chọn) Hiển thị dữ liệu đã lọc
 # st.write("🔍 **Dữ liệu đã lọc:**")
 # st.dataframe(final_filtered_df[final_filtered_df['Class_code'] == selected_class])
 
 # Lọc dữ liệu theo giảng viên và môn học đã chọn
-filtered_data = final_filtered_df.copy()
+filtered_data = filtered_df.copy()
 
 # st.dataframe(final_filtered_df)
 col4, col5, col6 = st.columns([0.45, 0.45, 0.45])
