@@ -40,6 +40,7 @@ with col3:
     box_date = str(datetime.datetime.now().strftime("%d %B %Y"))
     st.write(f"Last updated by:  \n {box_date}")
 
+filtered_df = df.copy()
 # ---------- Bộ lọc Đơn vị (Khoa) ----------
 with filter_col1:
     all_khoa = sorted(filtered_df['Đơn vị'].dropna().unique())
