@@ -78,7 +78,7 @@ with filter_col1:
 with filter_col2:
     selected_teacher = create_filter(filtered_df, 'Teacher_name', 'Chọn Giảng viên', st.session_state.selections['Teacher_name'])
 with filter_col3:
-    selected_subject = create_filter(filtered_df, 'Subject_name', 'Chọn Môn học', st.session_state.selections['Subject_name'])
+    selected_subjects = create_filter(filtered_df, 'Subject_name', 'Chọn Môn học', st.session_state.selections['Subject_name'])
 with filter_col4:
     selected_class = create_filter(filtered_df, 'Class_code', 'Chọn Mã lớp học', st.session_state.selections['Class_code'])
 
