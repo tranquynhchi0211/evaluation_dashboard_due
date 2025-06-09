@@ -42,44 +42,35 @@ with col3:
 
 # ---------- Bộ lọc Đơn vị (Khoa) ----------
 with filter_col1:
-    all_khoa = sorted(df['Đơn vị'].dropna().unique())
+    all_khoa = sorted(filtered_df['Đơn vị'].dropna().unique())
     selected_khoa = st.multiselect('Chọn Khoa (Đơn vị)', ['Tất cả'] + all_khoa)
-
-    # Nếu chọn "Tất cả", lấy toàn bộ
-    if 'Tất cả' in selected_khoa or not selected_khoa:
-        filtered_df_khoa = df.copy()
-    else:
-        filtered_df_khoa = df[df['Đơn vị'].isin(selected_khoa)]
+    if 'Tất cả' not in selected_khoa and selected_khoa:
+        filtered_df = filtered_df[filtered_df['Đơn vị'].isin(selected_khoa)]
+    filtered_df_khoa = filtered_df
 
 # ---------- Bộ lọc Giảng viên ----------
 with filter_col2:
-    all_teachers = sorted(filtered_df_khoa['Teacher_name'].dropna().unique())
+    all_teachers = sorted(filtered_df['Teacher_name'].dropna().unique())
     selected_teachers = st.multiselect('Chọn Giảng viên', ['Tất cả'] + all_teachers)
-
-    if 'Tất cả' in selected_teachers or not selected_teachers:
-        filtered_df_teacher = filtered_df_khoa
-    else:
-        filtered_df_teacher = filtered_df_khoa[filtered_df_khoa['Teacher_name'].isin(selected_teachers)]
+    if 'Tất cả' not in selected_teachers and selected_teachers:
+        filtered_df = filtered_df[filtered_df['Teacher_name'].isin(selected_teachers)]
+    filtered_df_teacher = filtered_df
 
 # ---------- Bộ lọc Môn học ----------
 with filter_col3:
-    all_subjects = sorted(filtered_df_teacher['Subject_name'].dropna().unique())
+    all_subjects = sorted(filtered_df['Subject_name'].dropna().unique())
     selected_subjects = st.multiselect('Chọn Môn học', ['Tất cả'] + all_subjects)
-
-    if 'Tất cả' in selected_subjects or not selected_subjects:
-        filtered_df_subject = filtered_df_teacher
-    else:
-        filtered_df_subject = filtered_df_teacher[filtered_df_teacher['Subject_name'].isin(selected_subjects)]
+    if 'Tất cả' not in selected_subjects and selected_subjects:
+        filtered_df = filtered_df[filtered_df['Subject_name'].isin(selected_subjects)]
+    filtered_df_subject = filtered_df
 
 # ---------- Bộ lọc Mã lớp ----------
 with filter_col4:
-    all_classes = sorted(filtered_df_subject['Class_code'].dropna().unique())
+    all_classes = sorted(filtered_df['Class_code'].dropna().unique())
     selected_classes = st.multiselect('Chọn Mã lớp học', ['Tất cả'] + all_classes)
-
-    if 'Tất cả' in selected_classes or not selected_classes:
-        final_filtered_df = filtered_df_subject
-    else:
-        final_filtered_df = filtered_df_subject[filtered_df_subject['Class_code'].isin(selected_classes)]
+    if 'Tất cả' not in selected_classes and selected_classes:
+        filtered_df = filtered_df[filtered_df['Class_code'].isin(selected_classes)]
+    final_filtered_df = filtered_df
 
 # ---------- Hiển thị kết quả ----------
 # st.write("🔍 **Dữ liệu đã lọc:**")
