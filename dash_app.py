@@ -40,56 +40,58 @@ with col3:
     box_date = str(datetime.datetime.now().strftime("%d %B %Y"))
     st.write(f"Last updated by:  \n {box_date}")
 
-# Lấy tất cả giá trị có thể chọn từ ban đầu
-all_khoa = sorted(df['Đơn vị'].dropna().unique())
-all_teachers = sorted(df['Teacher_name'].dropna().unique())
-all_subjects = sorted(df['Subject_name'].dropna().unique())
-all_classes = sorted(df['Class_code'].dropna().unique())
-
-# Tạo 4 cột để hiển thị bộ lọc song song
-filter_col1, filter_col2, filter_col3, filter_col4 = st.columns(4)
-
-# Giao diện chọn
+# ---------- Bộ lọc Đơn vị (Khoa) ----------
 with filter_col1:
-    selected_khoa = st.multiselect('🎓 Chọn Khoa', all_khoa)
+    all_khoa = sorted(df['Đơn vị'].dropna().unique())
+    selected_khoa = st.multiselect('Chọn Khoa (Đơn vị)', ['Tất cả'] + all_khoa)
+
+    # Nếu chọn "Tất cả", lấy toàn bộ
+    if 'Tất cả' in selected_khoa or not selected_khoa:
+        filtered_df_khoa = df.copy()
+    else:
+        filtered_df_khoa = df[df['Đơn vị'].isin(selected_khoa)]
+
+# ---------- Bộ lọc Giảng viên ----------
 with filter_col2:
-    selected_teachers = st.multiselect('👩‍🏫 Chọn Giảng viên', all_teachers)
+    all_teachers = sorted(filtered_df_khoa['Teacher_name'].dropna().unique())
+    selected_teachers = st.multiselect('Chọn Giảng viên', ['Tất cả'] + all_teachers)
+
+    if 'Tất cả' in selected_teachers or not selected_teachers:
+        filtered_df_teacher = filtered_df_khoa
+    else:
+        filtered_df_teacher = filtered_df_khoa[filtered_df_khoa['Teacher_name'].isin(selected_teachers)]
+
+# ---------- Bộ lọc Môn học ----------
 with filter_col3:
-    selected_subjects = st.multiselect('📘 Chọn Môn học', all_subjects)
+    all_subjects = sorted(filtered_df_teacher['Subject_name'].dropna().unique())
+    selected_subjects = st.multiselect('Chọn Môn học', ['Tất cả'] + all_subjects)
+
+    if 'Tất cả' in selected_subjects or not selected_subjects:
+        filtered_df_subject = filtered_df_teacher
+    else:
+        filtered_df_subject = filtered_df_teacher[filtered_df_teacher['Subject_name'].isin(selected_subjects)]
+
+# ---------- Bộ lọc Mã lớp ----------
 with filter_col4:
-    selected_classes = st.multiselect('🏷️ Chọn Mã lớp học', all_classes)
+    all_classes = sorted(filtered_df_subject['Class_code'].dropna().unique())
+    selected_classes = st.multiselect('Chọn Mã lớp học', ['Tất cả'] + all_classes)
 
-# -----------------------------------
-# Lọc trung tâm dựa vào tất cả filter đã chọn
-filtered_df = df.copy()
+    if 'Tất cả' in selected_classes or not selected_classes:
+        final_filtered_df = filtered_df_subject
+    else:
+        final_filtered_df = filtered_df_subject[filtered_df_subject['Class_code'].isin(selected_classes)]
 
-if selected_khoa:
-    filtered_df = filtered_df[filtered_df['Đơn vị'].isin(selected_khoa)]
+# ---------- Hiển thị kết quả ----------
+# st.write("🔍 **Dữ liệu đã lọc:**")
+# st.dataframe(final_filtered_df)
 
-if selected_teachers:
-    filtered_df = filtered_df[filtered_df['Teacher_name'].isin(selected_teachers)]
 
-if selected_subjects:
-    filtered_df = filtered_df[filtered_df['Subject_name'].isin(selected_subjects)]
+# # (Tuỳ chọn) Hiển thị dữ liệu đã lọc
+# st.write("🔍 **Dữ liệu đã lọc:**")
+# st.dataframe(final_filtered_df[final_filtered_df['Class_code'] == selected_class])
 
-if selected_classes:
-    filtered_df = filtered_df[filtered_df['Class_code'].isin(selected_classes)]
-
-# -----------------------------------
-# Cập nhật lại danh sách có thể chọn cho từng bộ lọc (phản ánh lẫn nhau)
-all_khoa = sorted(filtered_df['Đơn vị'].dropna().unique())
-all_teachers = sorted(filtered_df['Teacher_name'].dropna().unique())
-all_subjects = sorted(filtered_df['Subject_name'].dropna().unique())
-all_classes = sorted(filtered_df['Class_code'].dropna().unique())
-
-# Gợi ý nâng cao: bạn có thể dùng `st.experimental_rerun()` sau khi người dùng chọn để tự động cập nhật toàn bộ filter,
-# nhưng cần có cách xử lý lưu trạng thái trước đó (vd dùng Session State nếu cần).
-
-# -----------------------------------
-# Hiển thị dữ liệu đã lọc
-st.markdown("### 📋 Kết quả lọc:")
-st.dataframe(filtered_df)
-
+# Lọc dữ liệu theo giảng viên và môn học đã chọn
+filtered_data = final_filtered_df.copy()
 # # (Tuỳ chọn) Hiển thị dữ liệu đã lọc
 # st.write("🔍 **Dữ liệu đã lọc:**")
 # st.dataframe(final_filtered_df[final_filtered_df['Class_code'] == selected_class])
