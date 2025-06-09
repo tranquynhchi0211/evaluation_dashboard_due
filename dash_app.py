@@ -51,7 +51,7 @@ filter_cols = {
 selections = {}
 
 # Lọc dữ liệu ban đầu (chưa lọc gì)
-final_filtered_df = df.copy()
+filtered_df = df.copy()
 
 # Tạo 4 cột song song
 filter_col1, filter_col2, filter_col3, filter_col4 = st.columns(4)
@@ -67,7 +67,7 @@ filter_widgets = {
 # 1. Lấy các lựa chọn hiện tại từ người dùng (dựa trên filtered_df tạm thời)
 for col, label in filter_cols.items():
     with filter_widgets[col]:
-        unique_values = sorted(final_filtered_df[col].dropna().unique())
+        unique_values = sorted(filtered_df[col].dropna().unique())
         options = ['Tất cả'] + unique_values
         selections[col] = st.multiselect(label, options, default=['Tất cả'])
 
@@ -75,7 +75,7 @@ for col, label in filter_cols.items():
 for col in filter_cols:
     selected = selections[col]
     if 'Tất cả' not in selected and selected:
-        final_filtered_df = final_filtered_df[final_filtered_df[col].isin(selected)]
+        filtered_df = filtered_df[filtered_df[col].isin(selected)]
 
 # ---------- Hiển thị kết quả ----------
 # st.write("🔍 **Dữ liệu đã lọc:**")
