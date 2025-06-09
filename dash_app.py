@@ -40,6 +40,8 @@ with col3:
     box_date = str(datetime.datetime.now().strftime("%d %B %Y"))
     st.write(f"Last updated by:  \n {box_date}")
 
+
+# ---------- Hàm lọc dữ liệu ----------
 def get_filtered_df(khoa, teacher, subject, class_code):
     filtered = df.copy()
 
@@ -62,7 +64,7 @@ for key in ['selected_khoa', 'selected_teacher', 'selected_subject', 'selected_c
     if key not in st.session_state:
         st.session_state[key] = ['Tất cả']
 
-# ---------- Lấy dữ liệu đã lọc ----------
+# ---------- Tính toán dữ liệu đã lọc ----------
 filtered_df = get_filtered_df(
     st.session_state['selected_khoa'],
     st.session_state['selected_teacher'],
@@ -70,51 +72,53 @@ filtered_df = get_filtered_df(
     st.session_state['selected_class']
 )
 
-# ---------- Lọc lại danh sách các giá trị có thể chọn ----------
+# ---------- Lấy danh sách chọn lọc từ filtered_df ----------
 available_khoa = sorted(filtered_df['Đơn vị'].dropna().unique())
 available_teacher = sorted(filtered_df['Teacher_name'].dropna().unique())
 available_subject = sorted(filtered_df['Subject_name'].dropna().unique())
 available_class = sorted(filtered_df['Class_code'].dropna().unique())
 
-# ---------- Hiển thị các bộ lọc với giá trị được cập nhật ----------
-with st.sidebar:
-    selected_khoa = st.multiselect(
-        "Chọn Khoa (Đơn vị)", 
+# ---------- Layout theo columns ----------
+col3, filter_col1, filter_col2, filter_col3, filter_col4 = st.columns([0.2, 0.3, 0.3, 0.3, 0.3])
+
+with filter_col1:
+    st.session_state['selected_khoa'] = st.multiselect(
+        'Chọn Khoa (Đơn vị)',
         options=['Tất cả'] + available_khoa,
-        default=st.session_state['selected_khoa'],
-        key='selected_khoa'
+        default=st.session_state['selected_khoa']
     )
 
-    selected_teacher = st.multiselect(
-        "Chọn Giảng viên",
+with filter_col2:
+    st.session_state['selected_teacher'] = st.multiselect(
+        'Chọn Giảng viên',
         options=['Tất cả'] + available_teacher,
-        default=st.session_state['selected_teacher'],
-        key='selected_teacher'
+        default=st.session_state['selected_teacher']
     )
 
-    selected_subject = st.multiselect(
-        "Chọn Môn học",
+with filter_col3:
+    st.session_state['selected_subject'] = st.multiselect(
+        'Chọn Môn học',
         options=['Tất cả'] + available_subject,
-        default=st.session_state['selected_subject'],
-        key='selected_subject'
+        default=st.session_state['selected_subject']
     )
 
-    selected_class = st.multiselect(
-        "Chọn Mã lớp",
+with filter_col4:
+    st.session_state['selected_class'] = st.multiselect(
+        'Chọn Mã lớp học',
         options=['Tất cả'] + available_class,
-        default=st.session_state['selected_class'],
-        key='selected_class'
+        default=st.session_state['selected_class']
     )
 
-# ---------- Tính lại từng bước để giữ tên biến ----------
-filtered_df_khoa = get_filtered_df(selected_khoa, ['Tất cả'], ['Tất cả'], ['Tất cả'])
-filtered_df_teacher = get_filtered_df(selected_khoa, selected_teacher, ['Tất cả'], ['Tất cả'])
-filtered_df_subject = get_filtered_df(selected_khoa, selected_teacher, selected_subject, ['Tất cả'])
-final_filtered_df = get_filtered_df(selected_khoa, selected_teacher, selected_subject, selected_class)
-
-# ---------- Hiển thị kết quả ----------
-st.markdown("### 🔍 Dữ liệu đã lọc")
-st.dataframe(final_filtered_df)
+# ---------- Tính từng bước để giữ tên biến ----------
+filtered_df_khoa = get_filtered_df(st.session_state['selected_khoa'], ['Tất cả'], ['Tất cả'], ['Tất cả'])
+filtered_df_teacher = get_filtered_df(st.session_state['selected_khoa'], st.session_state['selected_teacher'], ['Tất cả'], ['Tất cả'])
+filtered_df_subject = get_filtered_df(st.session_state['selected_khoa'], st.session_state['selected_teacher'], st.session_state['selected_subject'], ['Tất cả'])
+final_filtered_df = get_filtered_df(
+    st.session_state['selected_khoa'],
+    st.session_state['selected_teacher'],
+    st.session_state['selected_subject'],
+    st.session_state['selected_class']
+)
 
 # ---------- Hiển thị kết quả ----------
 # st.write("🔍 **Dữ liệu đã lọc:**")
