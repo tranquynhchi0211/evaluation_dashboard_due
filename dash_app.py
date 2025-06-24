@@ -309,3 +309,50 @@ else:
     st.info("Không tìm thấy cột `comment_processed` trong dữ liệu.")
 
 
+import io
+def generate_excel_file(evaluation_df, comments_df,
+                        selected_khoa, selected_teachers,
+                        selected_subjects, selected_classes):
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+        workbook = writer.book
+
+        # Ghi sheet "Kết quả đánh giá"
+        sheet_name = "Kết quả đánh giá"
+        evaluation_df.to_excel(writer, sheet_name=sheet_name, index=False, startrow=6)
+        worksheet = writer.sheets[sheet_name]
+
+        # Tiêu đề lớn
+        title_format = workbook.add_format({'bold': True, 'font_size': 16})
+        worksheet.write("A1", "📊 BÁO CÁO ĐÁNH GIÁ GIẢNG VIÊN", title_format)
+
+        # Thông tin bộ lọc
+        info_format = workbook.add_format({'italic': True})
+        worksheet.write("A3", f"Đơn vị: {', '.join(selected_khoa) if selected_khoa else 'Tất cả'}", info_format)
+        worksheet.write("A4", f"Giảng viên: {', '.join(selected_teachers) if selected_teachers else 'Tất cả'}", info_format)
+        worksheet.write("A5", f"Môn học: {', '.join(selected_subjects) if selected_subjects else 'Tất cả'}", info_format)
+        worksheet.write("A6", f"Lớp học: {', '.join(selected_classes) if selected_classes else 'Tất cả'}", info_format)
+
+        # Ghi sheet "Bình luận nổi bật"
+        comments_df.to_excel(writer, sheet_name="Bình luận nổi bật", index=False)
+
+    output.seek(0)
+    return output
+
+# Tạo nút xuất file Excel
+if not result_df.empty and not comments_df.empty:
+    excel_data = generate_excel_file(
+        result_df,
+        comments_df,
+        selected_khoa,
+        selected_teachers,
+        selected_subjects,
+        selected_classes
+    )
+
+    st.download_button(
+        label="📥 Tải xuống báo cáo (.xlsx)",
+        data=excel_data,
+        file_name='bao_cao_danh_gia.xlsx',
+        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
