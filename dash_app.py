@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from collections import Counter
 
 # Read data from csv file
-df = pd.read_csv("danhsach_due.csv")
+df = pd.read_csv("danhsach_due_cleaned.csv", sep=';')
 
 st.set_page_config(layout="wide")
 st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
@@ -81,17 +81,14 @@ with filter_col4:
     else:
         final_filtered_df = filtered_df_subject[filtered_df_subject['Class_code'].isin(selected_classes)]
 
+if st.button("🔄 Reset bộ lọc"):
+    for key in ['selected_khoa', 'selected_teachers', 'selected_subjects', 'selected_classes']:
+        st.session_state[key] = []
 # ---------- Hiển thị kết quả ----------
 # st.write("🔍 **Dữ liệu đã lọc:**")
 # st.dataframe(final_filtered_df)
 
 
-# # (Tuỳ chọn) Hiển thị dữ liệu đã lọc
-# st.write("🔍 **Dữ liệu đã lọc:**")
-# st.dataframe(final_filtered_df[final_filtered_df['Class_code'] == selected_class])
-
-# Lọc dữ liệu theo giảng viên và môn học đã chọn
-filtered_data = final_filtered_df.copy()
 # # (Tuỳ chọn) Hiển thị dữ liệu đã lọc
 # st.write("🔍 **Dữ liệu đã lọc:**")
 # st.dataframe(final_filtered_df[final_filtered_df['Class_code'] == selected_class])
@@ -130,7 +127,7 @@ with col6:
 
 ####################
 # filtered_data = df[(df['Teacher_name'] == selected_teacher) & 
-#                    (df['Subject_name'] == selected_subjects)]
+#                    (df['Subject_name'] == selected_subject)]
 
 # Tạo danh sách các câu hỏi (Q1 đến Q12)
 
@@ -168,18 +165,18 @@ if not filtered_data.empty:
 
     # Ánh xạ nội dung câu hỏi
     question_labels = {
-        'Q1': '1. Giảng viên giới thiệu rõ ràng, đầy đủ về đề cương chi tiết học phần, gồm: chuẩn đầu ra, nội dung, phương pháp dạy - học, phương pháp kiểm tra - đánh giá, tài liệu học tập của học phần',
-        'Q2': '2. Nội dung của học phần phù hợp với năng lực của người học',
-        'Q3': '3. Phương pháp dạy - học phù hợp với chuẩn đầu ra và nội dung của học phần',
-        'Q4': '4. Giảng viên thực hiện đầy đủ kế hoạch dạy - học đã công bố và tuân thủ các quy định trong giảng dạy',
-        'Q5': '5. Giảng viên có cập nhật kiến thức mới và thực tế trong bài giảng',
-        'Q6': '6. Hoạt động dạy - học khơi gợi đam mê khám phá và giúp phát triển khả năng tự học',
-        'Q7': '7. Giảng viên khuyến khích người học chủ động tham gia thảo luận, giải quyết vấn đề trong giờ học',
-        'Q8': '8. Giảng viên tận tụy, sẵn sàng giúp đỡ, giải đáp thỏa đáng các thắc mắc của người học',
-        'Q9': '9. Giảng viên sử dụng hiệu quả Elearning và các phương tiện công nghệ trong tổ chức dạy học',
-        'Q10':'10. Phương pháp kiểm tra, đánh giá phù hợp với chuẩn đầu ra và nội dung của học phần',
-        'Q11': '11. Việc đánh giá được thực hiện công bằng, khách quan và đảm bảo độ tin cậy',
-        'Q12': '12. Anh/Chị hài lòng về chất lượng và hiệu quả giảng dạy của giảng viên đối với sự tiến bộ trong học tập của bản thân'
+        'Q1': 'Giảng viên giới thiệu rõ ràng, đầy đủ về đề cương chi tiết học phần, gồm: chuẩn đầu ra, nội dung, phương pháp dạy - học, phương pháp kiểm tra - đánh giá, tài liệu học tập của học phần',
+        'Q2': 'Nội dung của học phần phù hợp với năng lực của người học',
+        'Q3': 'Phương pháp dạy - học phù hợp với chuẩn đầu ra và nội dung của học phần',
+        'Q4': 'Giảng viên thực hiện đầy đủ kế hoạch dạy - học đã công bố và tuân thủ các quy định trong giảng dạy',
+        'Q5': 'Giảng viên có cập nhật kiến thức mới và thực tế trong bài giảng',
+        'Q6': 'Hoạt động dạy - học khơi gợi đam mê khám phá và giúp phát triển khả năng tự học',
+        'Q7': 'Giảng viên khuyến khích người học chủ động tham gia thảo luận, giải quyết vấn đề trong giờ học',
+        'Q8': 'Giảng viên tận tụy, sẵn sàng giúp đỡ, giải đáp thỏa đáng các thắc mắc của người học',
+        'Q9': 'Giảng viên sử dụng hiệu quả Elearning và các phương tiện công nghệ trong tổ chức dạy học',
+        'Q10': 'Phương pháp kiểm tra, đánh giá phù hợp với chuẩn đầu ra và nội dung của học phần',
+        'Q11': 'Việc đánh giá được thực hiện công bằng, khách quan và đảm bảo độ tin cậy',
+        'Q12': 'Anh/Chị hài lòng về chất lượng và hiệu quả giảng dạy của giảng viên đối với sự tiến bộ trong học tập của bản thân'
     }
     result_df['Câu hỏi'] = result_df['Câu hỏi'].map(question_labels)
 
@@ -242,57 +239,73 @@ else:
     st.warning("Không có dữ liệu phù hợp với bộ lọc đã chọn.")
 
 # Tạo 2 cột cạnh nhau
-chart_col, comment_col = st.columns(2)
+# chart_col, comment_col = st.columns(2)
 
 # ==== CỘT BIỂU ĐỒ CẢM XÚC ====
-with chart_col:
-    st.markdown("### 😊 Nhận xét đánh giá ")
+# with chart_col:
+#     st.markdown("### 😊 Nhận xét đánh giá ")
 
-    if 'sentiment' in filtered_data.columns:
-        sentiment_counts = Counter({'Positive': 0, 'Neutral': 0, 'Negative': 0})
-        sentiment_counts.update(filtered_data['sentiment'].dropna())
+#     if 'sentiment' in filtered_data.columns:
+#         sentiment_counts = Counter({'Positive': 0, 'Neutral': 0, 'Negative': 0})
+#         sentiment_counts.update(filtered_data['sentiment'].dropna())
 
-        labels = ['Positive', 'Neutral', 'Negative']
-        values = [sentiment_counts[label] for label in labels]
-        colors = ['green', 'gray', 'red']
+#         labels = ['Positive', 'Neutral', 'Negative']
+#         values = [sentiment_counts[label] for label in labels]
+#         colors = ['green', 'gray', 'red']
 
-        fig = go.Figure(data=[go.Bar(
-            x=labels,
-            y=values,
-            marker_color=colors,
-            text=values,
-            textposition='outside'
-        )])
+#         fig = go.Figure(data=[go.Bar(
+#             x=labels,
+#             y=values,
+#             marker_color=colors,
+#             text=values,
+#             textposition='outside'
+#         )])
 
-        fig.update_layout(
-            title=f'Phân bố cảm xúc - {selected_teachers} - {selected_subjects}',
-            xaxis_title='Cảm xúc',
-            yaxis_title='Số lượng',
-            yaxis=dict(range=[0, max(values)+10000]),
-            height=500
-        )
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.info("Không tìm thấy cột `sentiment` trong dữ liệu.")
+#         fig.update_layout(
+#             title=f'Phân bố cảm xúc - {selected_teachers} - {selected_subjects}',
+#             xaxis_title='Cảm xúc',
+#             yaxis_title='Số lượng',
+#             yaxis=dict(range=[0, max(values)+10000]),
+#             height=500
+#         )
+#         st.plotly_chart(fig, use_container_width=True)
+#     else:
+#         st.info("Không tìm thấy cột `sentiment` trong dữ liệu.")
 
 # ==== CỘT TOP 10 BÌNH LUẬN ====
-with comment_col:
-    st.markdown("### 📝 Những bình luận nổi bật")
+# with comment_col:
+#     st.markdown("### 📝 Những bình luận nổi bật")
 
-    if 'comment_processed' in filtered_data.columns:
-        sorted_comments = sorted(
-            filtered_data['comment_processed'].dropna().unique(), 
-            key=len, reverse=True
-        )[:10]
+#     if 'comment_processed' in final_filtered_df.columns:
+#         sorted_comments = sorted(
+#             final_filtered_df['comment_processed'].dropna().unique(), 
+#             key=len, reverse=True
+#         )
 
-        comments_df = pd.DataFrame({
-            "STT": list(range(1, len(sorted_comments) + 1)),
-            "Bình luận": sorted_comments
-        })
+#         comments_df = pd.DataFrame({
+#             "STT": list(range(1, len(sorted_comments) + 1)),
+#             "Bình luận": sorted_comments
+#         })
 
+#         st.dataframe(comments_df, use_container_width=True, hide_index=True)
+#     else:
+#         st.info("Không tìm thấy cột `comment_processed` trong dữ liệu.")
 
-        # Hiển thị bảng mà không có cột index thừa
-        st.dataframe(comments_df, use_container_width=True, hide_index=True)
-    else:
-        st.info("Không tìm thấy cột `comment_processed` trong dữ liệu.")
+st.markdown("### 📝 Những bình luận nổi bật")
+
+if 'comment_processed' in final_filtered_df.columns:
+    sorted_comments = sorted(
+        final_filtered_df['comment_processed'].dropna().unique(), 
+        key=len, reverse=True
+    )
+
+    comments_df = pd.DataFrame({
+        "STT": list(range(1, len(sorted_comments) + 1)),
+        "Bình luận": sorted_comments
+    })
+
+    st.dataframe(comments_df, use_container_width=True, hide_index=True)
+else:
+    st.info("Không tìm thấy cột `comment_processed` trong dữ liệu.")
+
 
