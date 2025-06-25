@@ -344,7 +344,23 @@ def generate_excel_file(evaluation_df, comments_df,
     return output
 
 
+# Tạo nút xuất file Excel
+if not result_df.empty and not comments_df.empty:
+    excel_data = generate_excel_file(
+        result_df,
+        comments_df,
+        selected_khoa,
+        selected_teachers,
+        selected_subjects,
+        selected_classes
+    )
 
+    st.download_button(
+        label="📥 Tải xuống báo cáo (.xlsx)",
+        data=excel_data,
+        file_name='bao_cao_danh_gia.xlsx',
+        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
 
 #### xuất excel toàn bộ
 import os
