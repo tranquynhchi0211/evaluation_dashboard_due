@@ -81,9 +81,7 @@ with filter_col4:
     else:
         final_filtered_df = filtered_df_subject[filtered_df_subject['Class_code'].isin(selected_classes)]
 
-if st.button("🔄 Reset bộ lọc"):
-    for key in ['selected_khoa', 'selected_teachers', 'selected_subjects', 'selected_classes']:
-        st.session_state[key] = []
+
 # ---------- Hiển thị kết quả ----------
 # st.write("🔍 **Dữ liệu đã lọc:**")
 # st.dataframe(final_filtered_df)
@@ -308,7 +306,7 @@ if 'comment_processed' in final_filtered_df.columns:
 else:
     st.info("Không tìm thấy cột `comment_processed` trong dữ liệu.")
 
-
+#######Xuất excel
 import io
 def generate_excel_file(evaluation_df, comments_df,
                         selected_khoa, selected_teachers,
@@ -317,10 +315,10 @@ def generate_excel_file(evaluation_df, comments_df,
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         workbook = writer.book
 
-        # Ghi sheet "Kết quả đánh giá"
-        sheet_name = "Kết quả đánh giá"
-        evaluation_df.to_excel(writer, sheet_name=sheet_name, index=False, startrow=6)
-        worksheet = writer.sheets[sheet_name]
+        # Ghi sheet "Báo cáo"
+        sheet_name = "Báo cáo"
+        worksheet = writer.book.add_worksheet(sheet_name)
+        writer.sheets[sheet_name] = worksheet
 
         # Tiêu đề lớn
         title_format = workbook.add_format({'bold': True, 'font_size': 16})
@@ -333,11 +331,18 @@ def generate_excel_file(evaluation_df, comments_df,
         worksheet.write("A5", f"Môn học: {', '.join(selected_subjects) if selected_subjects else 'Tất cả'}", info_format)
         worksheet.write("A6", f"Lớp học: {', '.join(selected_classes) if selected_classes else 'Tất cả'}", info_format)
 
-        # Ghi sheet "Bình luận nổi bật"
-        comments_df.to_excel(writer, sheet_name="Bình luận nổi bật", index=False)
+        # --- Ghi bảng kết quả đánh giá bắt đầu từ dòng 8 ---
+        startrow_eval = 7  # (vì dòng 1-6 đã dùng)
+        evaluation_df.to_excel(writer, sheet_name=sheet_name, index=False, startrow=startrow_eval)
+
+        # --- Ghi bảng bình luận nổi bật cách ra sau ---
+        startrow_comment = startrow_eval + len(evaluation_df) + 4
+        worksheet.write(startrow_comment - 1, 0, "📝 BÌNH LUẬN NỔI BẬT", title_format)
+        comments_df.to_excel(writer, sheet_name=sheet_name, index=False, startrow=startrow_comment)
 
     output.seek(0)
     return output
+
 
 # Tạo nút xuất file Excel
 if not result_df.empty and not comments_df.empty:
@@ -356,3 +361,130 @@ if not result_df.empty and not comments_df.empty:
         file_name='bao_cao_danh_gia.xlsx',
         mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+
+#### xuất excel toàn bộ
+import os
+import tempfile
+import zipfile
+
+def generate_all_reports_zip(df):
+    temp_dir = tempfile.mkdtemp()
+    zip_path = os.path.join(temp_dir, "BaoCaoTong.zip")
+
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for don_vi in df['Đơn vị'].dropna().unique():
+            df_khoa = df[df['Đơn vị'] == don_vi]
+            for gv in df_khoa['Teacher_name'].dropna().unique():
+                df_gv = df_khoa[df_khoa['Teacher_name'] == gv]
+                for mon in df_gv['Subject_name'].dropna().unique():
+                    df_mon = df_gv[df_gv['Subject_name'] == mon]
+                    class_codes = df_mon['Class_code'].dropna().unique()
+
+                    file_buffer = io.BytesIO()
+                    with pd.ExcelWriter(file_buffer, engine='xlsxwriter') as writer:
+                        workbook = writer.book
+
+                        for class_code in class_codes:
+                            df_lop = df_mon[df_mon['Class_code'] == class_code]
+                            sheet_name = str(class_code)[:31]  # Giới hạn 31 ký tự cho tên sheet
+
+                            # --- Tạo bảng kết quả đánh giá ---
+                            q_cols = [f'Q{i}' for i in range(1, 13)]
+                            result_list = []
+                            for q in q_cols:
+                                avg_score = df_lop[q].mean()
+                                std_score = df_lop[q].std()
+                                count_level = [(df_lop[q] == i).sum() for i in range(1, 6)]
+                                avg_class_hp = df_mon[q].mean()
+                                avg_score_all = df[q].mean()
+
+                                result_list.append([
+                                    q, round(avg_score, 2), round(std_score, 2), *count_level,
+                                    round(avg_class_hp, 2), round(avg_score_all, 2)
+                                ])
+
+                            evaluation_df = pd.DataFrame(result_list, columns=[
+                                'Câu hỏi', 'Đánh giá trung bình', 'Độ lệch chuẩn',
+                                'Số câu ở mức 1', 'Số câu ở mức 2', 'Số câu ở mức 3',
+                                'Số câu ở mức 4', 'Số câu ở mức 5',
+                                'TB các lớp của cùng HP', 'TB toàn trường'
+                            ])
+
+                            question_labels = {
+                                'Q1': 'Giảng viên giới thiệu rõ ràng về đề cương',
+                                'Q2': 'Nội dung học phần phù hợp',
+                                'Q3': 'Phương pháp dạy phù hợp',
+                                'Q4': 'Giảng viên giảng dạy đúng kế hoạch',
+                                'Q5': 'Cập nhật kiến thức mới',
+                                'Q6': 'Khơi gợi đam mê tự học',
+                                'Q7': 'Khuyến khích chủ động',
+                                'Q8': 'Tận tụy và sẵn sàng hỗ trợ',
+                                'Q9': 'Sử dụng Elearning hiệu quả',
+                                'Q10': 'Đánh giá phù hợp chuẩn đầu ra',
+                                'Q11': 'Đánh giá công bằng',
+                                'Q12': 'Hài lòng tổng thể'
+                            }
+                            evaluation_df['Câu hỏi'] = evaluation_df['Câu hỏi'].map(question_labels)
+
+                            avg_row = {
+                                'Câu hỏi': 'Trung bình chung',
+                                'Đánh giá trung bình': round(evaluation_df['Đánh giá trung bình'].mean(), 2),
+                                'Độ lệch chuẩn': '',
+                                'Số câu ở mức 1': '',
+                                'Số câu ở mức 2': '',
+                                'Số câu ở mức 3': '',
+                                'Số câu ở mức 4': '',
+                                'Số câu ở mức 5': '',
+                                'TB các lớp của cùng HP': round(evaluation_df['TB các lớp của cùng HP'].mean(), 2),
+                                'TB toàn trường': round(evaluation_df['TB toàn trường'].mean(), 2)
+                            }
+
+                            evaluation_df = pd.concat([evaluation_df, pd.DataFrame([avg_row])], ignore_index=True)
+
+                            # --- Tạo bảng bình luận ---
+                            if 'comment_processed' in df_lop.columns:
+                                sorted_comments = sorted(
+                                    df_lop['comment_processed'].dropna().unique(),
+                                    key=len, reverse=True
+                                )
+                                comments_df = pd.DataFrame({
+                                    "STT": list(range(1, len(sorted_comments) + 1)),
+                                    "Bình luận": sorted_comments
+                                })
+                            else:
+                                comments_df = pd.DataFrame(columns=["STT", "Bình luận"])
+
+                            # --- Ghi sheet ---
+                            worksheet = workbook.add_worksheet(sheet_name)
+                            writer.sheets[sheet_name] = worksheet
+
+                            title_format = workbook.add_format({'bold': True, 'font_size': 14})
+                            info_format = workbook.add_format({'italic': True})
+
+                            worksheet.write("A1", "📊 BÁO CÁO ĐÁNH GIÁ GIẢNG VIÊN", title_format)
+                            worksheet.write("A2", f"Đơn vị: {don_vi}", info_format)
+                            worksheet.write("A3", f"Giảng viên: {gv}", info_format)
+                            worksheet.write("A4", f"Môn học: {mon}", info_format)
+                            worksheet.write("A5", f"Lớp học: {class_code}", info_format)
+
+                            evaluation_df.to_excel(writer, sheet_name=sheet_name, index=False, startrow=7)
+                            comments_df.to_excel(writer, sheet_name=sheet_name, index=False,
+                                                 startrow=8 + len(evaluation_df) + 2)
+
+                    file_buffer.seek(0)
+                    folder_path = f"{don_vi}/{gv}"
+                    file_name = f"{mon}.xlsx"
+                    zipf.writestr(f"{folder_path}/{file_name}", file_buffer.read())
+
+    with open(zip_path, "rb") as f:
+        return f.read()
+
+if st.button("📦 Tải xuống tất cả báo cáo"):
+    with st.spinner("⏳ Đang tạo báo cáo tổng hợp..."):
+        zip_data = generate_all_reports_zip(df)
+        st.download_button(
+            label="⬇️ Tải toàn bộ báo cáo (.zip)",
+            data=zip_data,
+            file_name="BaoCaoTong.zip",
+            mime="application/zip"
+        )
