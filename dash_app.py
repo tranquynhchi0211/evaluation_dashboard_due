@@ -191,7 +191,7 @@ if not filtered_data.empty:
 
     # Ánh xạ nội dung câu hỏi
     question_labels = {
-        'Q1': '1. Giảng viên giới thiệu rõ ràng, đầy đủ về đề cương chi tiết học phần, gồm: chuẩn đầu ra, nội dung, phương pháp dạy - học, phương pháp kiểm tra - đánh giá, tài liệu học tập của học phần',
+        'Q1': '1.  Giảng viên giới thiệu rõ ràng, đầy đủ về đề cương chi tiết học phần, gồm: chuẩn đầu ra, nội dung, phương pháp dạy - học, phương pháp kiểm tra - đánh giá, tài liệu học tập của học phần',
         'Q2': '2. Nội dung của học phần phù hợp với năng lực của người học',
         'Q3': '3. Phương pháp dạy - học phù hợp với chuẩn đầu ra và nội dung của học phần',
         'Q4': '4. Giảng viên thực hiện đầy đủ kế hoạch dạy - học đã công bố và tuân thủ các quy định trong giảng dạy',
@@ -506,32 +506,28 @@ def generate_all_reports_zip(df):
                             ])
 
                             question_labels = {
-                                'Q1': 'Giảng viên giới thiệu rõ ràng về đề cương',
-                                'Q2': 'Nội dung học phần phù hợp',
-                                'Q3': 'Phương pháp dạy phù hợp',
-                                'Q4': 'Giảng viên giảng dạy đúng kế hoạch',
-                                'Q5': 'Cập nhật kiến thức mới',
-                                'Q6': 'Khơi gợi đam mê tự học',
-                                'Q7': 'Khuyến khích chủ động',
-                                'Q8': 'Tận tụy và sẵn sàng hỗ trợ',
-                                'Q9': 'Sử dụng Elearning hiệu quả',
-                                'Q10': 'Đánh giá phù hợp chuẩn đầu ra',
-                                'Q11': 'Đánh giá công bằng',
-                                'Q12': 'Hài lòng tổng thể'
+                                'Q1': '1. Giảng viên giới thiệu rõ ràng, đầy đủ về đề cương chi tiết học phần, gồm: chuẩn đầu ra, nội dung, phương pháp dạy - học, phương pháp kiểm tra - đánh giá, tài liệu học tập của học phần',
+                                'Q2': '2. Nội dung của học phần phù hợp với năng lực của người học',
+                                'Q3': '3. Phương pháp dạy - học phù hợp với chuẩn đầu ra và nội dung của học phần',
+                                'Q4': '4. Giảng viên thực hiện đầy đủ kế hoạch dạy - học đã công bố và tuân thủ các quy định trong giảng dạy',
+                                'Q5': '5. Giảng viên có cập nhật kiến thức mới và thực tế trong bài giảng',
+                                'Q6': '6. Hoạt động dạy - học khơi gợi đam mê khám phá và giúp phát triển khả năng tự học',
+                                'Q7': '7. Giảng viên khuyến khích người học chủ động tham gia thảo luận, giải quyết vấn đề trong giờ học',
+                                'Q8': '8. Giảng viên tận tụy, sẵn sàng giúp đỡ, giải đáp thỏa đáng các thắc mắc của người học',
+                                'Q9': '9. Giảng viên sử dụng hiệu quả Elearning và các phương tiện công nghệ trong tổ chức dạy học',
+                                'Q10': '10. Phương pháp kiểm tra, đánh giá phù hợp với chuẩn đầu ra và nội dung của học phần',
+                                'Q11': '11. Việc đánh giá được thực hiện công bằng, khách quan và đảm bảo độ tin cậy',
+                                'Q12': '12. Anh/Chị hài lòng về chất lượng và hiệu quả giảng dạy của giảng viên đối với sự tiến bộ trong học tập của bản thân'
                             }
                             evaluation_df['Câu hỏi'] = evaluation_df['Câu hỏi'].map(question_labels)
 
                             avg_row = {
                                 'Câu hỏi': 'Trung bình chung',
-                                'Đánh giá trung bình': round(evaluation_df['Đánh giá trung bình'].mean(), 2),
+                                'Đánh giá trung bình': round(result_df['Đánh giá trung bình'].mean(), 2),
                                 'Độ lệch chuẩn': '',
-                                'Số câu ở mức 1': '',
-                                'Số câu ở mức 2': '',
-                                'Số câu ở mức 3': '',
-                                'Số câu ở mức 4': '',
-                                'Số câu ở mức 5': '',
-                                'TB các lớp của cùng HP': round(evaluation_df['TB các lớp của cùng HP'].mean(), 2),
-                                'TB toàn trường': round(evaluation_df['TB toàn trường'].mean(), 2)
+                                'TB các lớp của cùng HP': round(result_df['TB các lớp của cùng HP'].mean(), 2),
+                                'TB toàn trường': round(result_df['TB toàn trường'].mean(), 2),
+                                'Tổng số câu': ''  # ✅ Không tính trung bình, để trống
                             }
 
                             evaluation_df = pd.concat([evaluation_df, pd.DataFrame([avg_row])], ignore_index=True)
