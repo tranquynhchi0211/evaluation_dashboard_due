@@ -417,7 +417,7 @@ def generate_excel_file(evaluation_df, comments_df,
 
         # Tiêu đề lớn
         title_format = workbook.add_format({'bold': True, 'font_size': 16})
-        worksheet.write("A1", "📊 BÁO CÁO ĐÁNH GIÁ GIẢNG VIÊN", title_format)
+        worksheet.write("A1", "📊 KẾT QUẢ KHẢO SÁT HỌC PHẦN HỌC KỲ I NĂM HỌC 2024-2025", title_format)
 
         # Thông tin bộ lọc
         info_format = workbook.add_format({'italic': True})
