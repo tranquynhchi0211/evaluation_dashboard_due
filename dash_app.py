@@ -459,8 +459,12 @@ if not result_df.empty and not comments_df.empty:
 
 #### xuất excel toàn bộ
 import os
-import tempfile
+import io
 import zipfile
+import tempfile
+import pandas as pd
+import xlsxwriter
+import streamlit as st
 
 def generate_all_reports_zip(df):
     temp_dir = tempfile.mkdtemp()
@@ -486,21 +490,22 @@ def generate_all_reports_zip(df):
                             # --- Tạo bảng kết quả đánh giá ---
                             q_cols = [f'Q{i}' for i in range(1, 13)]
                             result_list = []
+
                             for q in q_cols:
                                 avg_score = df_lop[q].mean()
                                 std_score = df_lop[q].std()
-                                count_level = [(df_lop[q] == i).sum() for i in range(1, 6)]
                                 avg_class_hp = df_mon[q].mean()
                                 avg_score_all = df[q].mean()
+                                total_count = df_lop[q].count()
 
                                 result_list.append([
-                                    q, round(avg_score, 2), round(std_score, 2), *count_level,
-                                    round(avg_class_hp, 2), round(avg_score_all, 2)
+                                    q, round(avg_score, 2), round(std_score, 2),
+                                    round(avg_class_hp, 2), round(avg_score_all, 2), total_count
                                 ])
 
                             evaluation_df = pd.DataFrame(result_list, columns=[
                                 'Câu hỏi', 'Đánh giá trung bình', 'Độ lệch chuẩn',
-                                 'TB các lớp của cùng HP', 'TB toàn trường', 'Tổng số câu'
+                                'TB các lớp của cùng HP', 'TB toàn trường', 'Tổng số câu'
                             ])
 
                             question_labels = {
@@ -521,11 +526,11 @@ def generate_all_reports_zip(df):
 
                             avg_row = {
                                 'Câu hỏi': 'Trung bình chung',
-                                'Đánh giá trung bình': round(result_df['Đánh giá trung bình'].mean(), 2),
+                                'Đánh giá trung bình': round(evaluation_df['Đánh giá trung bình'].mean(), 2),
                                 'Độ lệch chuẩn': '',
-                                'TB các lớp của cùng HP': round(result_df['TB các lớp của cùng HP'].mean(), 2),
-                                'TB toàn trường': round(result_df['TB toàn trường'].mean(), 2),
-                                'Tổng số câu': ''  # ✅ Không tính trung bình, để trống
+                                'TB các lớp của cùng HP': round(evaluation_df['TB các lớp của cùng HP'].mean(), 2),
+                                'TB toàn trường': round(evaluation_df['TB toàn trường'].mean(), 2),
+                                'Tổng số câu': ''
                             }
 
                             evaluation_df = pd.concat([evaluation_df, pd.DataFrame([avg_row])], ignore_index=True)
@@ -568,6 +573,8 @@ def generate_all_reports_zip(df):
     with open(zip_path, "rb") as f:
         return f.read()
 
+
+# Gọi trong Streamlit
 if st.button("📦 Tải xuống tất cả báo cáo"):
     with st.spinner("⏳ Đang tạo báo cáo tổng hợp..."):
         zip_data = generate_all_reports_zip(df)
