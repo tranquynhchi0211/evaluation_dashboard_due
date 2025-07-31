@@ -500,9 +500,7 @@ def generate_all_reports_zip(df):
 
                             evaluation_df = pd.DataFrame(result_list, columns=[
                                 'Câu hỏi', 'Đánh giá trung bình', 'Độ lệch chuẩn',
-                                'Số câu ở mức 1', 'Số câu ở mức 2', 'Số câu ở mức 3',
-                                'Số câu ở mức 4', 'Số câu ở mức 5',
-                                'TB các lớp của cùng HP', 'TB toàn trường'
+                                 'TB các lớp của cùng HP', 'TB toàn trường', 'Tổng số câu'
                             ])
 
                             question_labels = {
