@@ -489,6 +489,7 @@ def generate_all_reports_zip(df):
 
                             # --- Tạo bảng kết quả đánh giá ---
                             q_cols = [f'Q{i}' for i in range(1, 13)]
+                            total_count = df_lop['Q1'].count()
                             result_list = []
 
                             for q in q_cols:
@@ -496,7 +497,7 @@ def generate_all_reports_zip(df):
                                 std_score = df_lop[q].std()
                                 avg_class_hp = df_mon[q].mean()
                                 avg_score_all = df[q].mean()
-                                total_count = df_lop[q].count()
+                                # total_count = df_lop[q].count()
 
                                 result_list.append([
                                     q, round(avg_score, 2), round(std_score, 2),
