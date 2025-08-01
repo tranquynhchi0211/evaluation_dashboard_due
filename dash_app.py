@@ -555,7 +555,7 @@ def generate_all_reports_zip(df):
                             title_format = workbook.add_format({'bold': True, 'font_size': 14})
                             info_format = workbook.add_format({'italic': True})
 
-                            worksheet.write("A1", "📊 BÁO CÁO ĐÁNH GIÁ GIẢNG VIÊN", title_format)
+                            worksheet.write("A1", "📊 KẾT QUẢ KHẢO SÁT HỌC PHẦN HỌC KỲ I NĂM HỌC 2024-2025", title_format)
                             worksheet.write("A2", f"Đơn vị: {don_vi}", info_format)
                             worksheet.write("A3", f"Giảng viên: {gv}", info_format)
                             worksheet.write("A4", f"Môn học: {mon}", info_format)
